@@ -11,9 +11,6 @@
 *.userprefs
 
 # Build results
-[Pp]ublic/
-[Bb]in/
-[Tt]emp/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -24,9 +21,8 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-Public
-Temp
-Bin
+[Tt]emp/
+[Pp]ublic/
 
 # Visual Studio 2015 cache/options directory
 .vs/
