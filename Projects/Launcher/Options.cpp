@@ -30,6 +30,7 @@ void Options::Init(Environment& env, Devices& dev)
 		arg == L"ffs"	? forceFullscreen = true : 0;
 		arg == L"mi"	? multiInstance = true : 0;
 		arg == L"norf"	? refocusOnShutdown = false : 0;
+		arg == L"f"		? supressError = true : 0;
 	}
 }
 
@@ -44,6 +45,7 @@ void Options::Print()
 	printf("\tCustomFrequency: %s\n", customFrequency ? "true" : "false");
 	printf("\tGamepad: %s\n", gamepad ? "true" : "false");
 	printf("\tForceFullscreen: %s\n", forceFullscreen ? "true" : "false");
+	printf("\tSupressError: %s\n", supressError ? "true" : "false");
 	printf("%ls\n", wstring(60, '-').c_str());
 }
 

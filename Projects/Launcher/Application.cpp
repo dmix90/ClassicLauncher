@@ -76,9 +76,7 @@ int Application::Run() {
 	}
 	
 	m_env.GenerateExecutables();
-#ifdef _DEBUG
-	system("pause");
-#endif
+
 	return false;
 }
 
@@ -86,5 +84,5 @@ void Application::Print()
 {
 	m_env.Print();
 	m_opt.Print();
-	//m_dev.Print();
+	m_dev.Print();
 }

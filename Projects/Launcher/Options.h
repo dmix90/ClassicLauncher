@@ -15,6 +15,7 @@ public:
 	bool customFrequency{ false };
 	bool gamepad{ false };
 	bool forceFullscreen{ false };
+	bool supressError{ false };
 	//bool steamApp{ false };
 public:
 	void Init(Environment& env, Devices& dev);

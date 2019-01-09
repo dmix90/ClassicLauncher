@@ -27,7 +27,7 @@ struct Display {
 	Resolution m_maxRes{ 0,0,0 };
 	Resolution m_minRes{ 0,0,0 };
 	Resolution m_boundRes{ 0,0,0 };
-	int customFrequencyValue{ 0 };
+	ulong customFrequencyValue{ 0 };
 	void ExtractBoundResolution(wstring arg) {
 		wstring res		= arg.substr(arg.find_first_of(L":") + 1);
 		wstring width	= res.substr(0, res.find_first_of('x'));
@@ -41,6 +41,10 @@ struct Display {
 		wstring frequency		= arg.substr(arg.find_first_of(L":") + 1);
 
 		customFrequencyValue	= stoi(frequency);
+		if (m_boundRes == Resolution{ 0,0,0 }) {
+			m_boundRes = m_originalRes;
+		}
+		m_boundRes.frequency = customFrequencyValue;
 	}
 	bool GetOriginalResolution() {
 		if (EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &m_devmode)) {
@@ -49,7 +53,7 @@ struct Display {
 			m_originalRes.frequency = m_devmode.dmDisplayFrequency;
 			return true;
 		};
-		printf("Could not get original display resolution!");
+		printf("Could not get original display resolution!\n");
 		return false;
 	};
 	bool QueryAllAvailableResolutionPairs() {
@@ -67,7 +71,8 @@ struct Display {
 			ulong minHeight = *min_element(tempHeight.begin(), tempHeight.end());
 
 			m_maxRes = { maxWidth, maxHeight, m_originalRes.frequency };
-			m_minRes = { minWidth, minHeight, m_originalRes.frequency };
+			m_minRes = { minWidth, minHeight, 30 };
+			m_devmode.dmDisplayFrequency = m_originalRes.frequency;
 
 			return  true;
 		};
@@ -76,10 +81,10 @@ struct Display {
 	};
 	bool ResetResolution() {
 		if (ChangeResolution(m_originalRes)) {
-			printf("Successfully restored original display resolution!");
+			printf("Successfully restored original display resolution!\n");
 			return true;
 		}
-		printf("Could not restore original display resolution!");
+		printf("Could not restore original display resolution!\n");
 		return false;
 	};
 	bool SetResolution() {
@@ -98,27 +103,25 @@ struct Display {
 			return false;
 		if (res.width < m_minRes.width || res.height < m_minRes.height || res.frequency < m_minRes.frequency)
 			return false;
-		if (m_devmode.dmPelsWidth == res.width || m_devmode.dmPelsHeight == res.height || m_devmode.dmDisplayFrequency == res.frequency)
+		if (m_devmode.dmPelsWidth == res.width && m_devmode.dmPelsHeight == res.height && m_devmode.dmDisplayFrequency == res.frequency)
 			return true;
 
-		m_devmode.dmPelsWidth			= res.width;
-		m_devmode.dmPelsHeight			= res.height;
-		m_devmode.dmDisplayFrequency	= res.frequency;
+		m_devmode.dmPelsWidth = res.width;
+		m_devmode.dmPelsHeight = res.height;
+		m_devmode.dmDisplayFrequency = res.frequency;
+
 		if (ChangeDisplaySettings(&m_devmode, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL)
 		{
 			Tools::Instance()->SleepFor(3500);
 				return true;
 		}
-		Tools::Instance()->MessageBoxTimeout(L"Failed to set display resolution to specified bounds", 5000, L"Error", MB_ICONERROR);
+		//Tools::Instance()->MessageBoxTimeout(L"Failed to set display resolution to specified bounds", 5000, L"Error", MB_ICONERROR);
+		printf("Failed to set display resolution to specified bounds: %ix%ix%i\n", res.width, res.height, res.frequency);
 
 		return ResetResolution();
 	}
 	void Init() {
 		QueryAllAvailableResolutionPairs();
-		if (customFrequencyValue != 0) {
-			m_boundRes.frequency = customFrequencyValue;
-			m_maxRes.frequency = customFrequencyValue;
-		}
 	};
 	void Print() {
 		printf("Available resolutions: \n");
